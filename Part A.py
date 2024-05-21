@@ -6,45 +6,8 @@ import time
 import pandas as pd
 import numpy as np
 
-# Define grid dimensions and spacing
-rows = 9
-columns = 10
-spacing = 25
-
-# Generate grid points
-grid_points = []
-for i in range(rows):
-    for j in range(columns):
-        x = j * spacing
-        y = i * spacing
-        grid_points.append((x, y))
-
-
-# Calculate Euclidean distance matrix
-num_points = len(grid_points)
-distance_matrix = np.zeros((num_points, num_points))
-
-for i in range(num_points):
-    for j in range(num_points):
-        x1, y1 = grid_points[i]
-        x2, y2 = grid_points[j]
-        distance = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
-        distance_matrix[i, j] = distance
-        
-# Print distance matrix
-print("Euclidean Distance Matrix:")
-print(distance_matrix)
-
-# Create binary matrix indicating distances less than or equal to 100
-dij_a = np.where(distance_matrix <= 100, 1, 0)
-
-# Print binary matrix
-print("Binary Matrix (dij_a) indicating distances <= 100:")
-print(dij_a)
-
-
 # Define candidate AEDs
-candidate_AEDs = [(3, 1), (5, 2), (5, 3)]
+candidate_AEDs = [(2,2),(2,6),(3, 4),(3, 5),(3, 6),(3, 9), (4, 6), (5, 5), (5, 6), (5, 8), (6, 8), (7, 2), (7, 3),(7,6)]
 candidate_locations = [(9, 7), (5, 2), (5, 3)]
 
 # Create a coverage matrix a_ij
@@ -66,13 +29,10 @@ print(a_ij)
 import matplotlib.pyplot as plt
 
 # Define grid dimensions and spacing
-rows = 9
-columns = 10
+rows = 11
+columns = 11
 spacing = 1
 
-# Define candidate AEDs and candidate locations
-candidate_AEDs = [(3, 1), (5, 2), (5, 3)]
-candidate_locations = [(2, 2), (5, 2), (5, 3)]
 
 # Create a grid of points
 grid_points = []
@@ -90,15 +50,14 @@ candidate_location_indices = [(int(y / spacing), int(x / spacing)) for x, y in c
 plt.figure(figsize=(8, 6))
 for point in grid_points:
     plt.plot(point[0], point[1], 'bo', markersize=6)
-
 # Plot candidate AEDs
 for AED in candidate_AED_indices:
     plt.plot(AED[1] * spacing, AED[0] * spacing, 'rs', markersize=10)
-'''
+
 # Plot candidate locations
 for location in candidate_location_indices:
     plt.plot(location[1] * spacing, location[0] * spacing, 'g^', markersize=10)
-'''
+
 # Add labels and title
 plt.xlabel('X-coordinate')
 plt.ylabel('Y-coordinate')
@@ -111,10 +70,6 @@ plt.grid(True)
 # Show plot
 plt.legend(['Grid Points', 'Candidate AEDs', 'Candidate Locations'], loc='upper right')
 plt.show()
-
-
-
-
 '''
 
 # Record the start time to calculate the computation time of the model
@@ -185,4 +140,95 @@ end_time = time.time()
 
 # Calculate the elapsed time of the the computation time of the model
 elapsed_time = end_time - start_time
+'''
+
+
+'''
+import matplotlib.pyplot as plt
+
+# Define grid dimensions and spacing
+rows = 9
+columns = 10
+spacing = 1
+
+# Define candidate AEDs and candidate locations
+candidate_AEDs = [(3, 1), (5, 2), (5, 3)]
+candidate_locations = [(2, 2), (5, 2), (5, 3)]
+
+# Create a grid of points
+grid_points = []
+for i in range(rows):
+    for j in range(columns):
+        x = j * spacing
+        y = i * spacing
+        grid_points.append((x, y))
+
+# Convert candidate AEDs and candidate locations to grid indices
+candidate_AED_indices = [(int(y / spacing), int(x / spacing)) for x, y in candidate_AEDs]
+candidate_location_indices = [(int(y / spacing), int(x / spacing)) for x, y in candidate_locations]
+
+# Plot the grid
+plt.figure(figsize=(8, 6))
+for point in grid_points:
+    plt.plot(point[0], point[1], 'bo', markersize=6)
+# Plot candidate AEDs
+for AED in candidate_AED_indices:
+    plt.plot(AED[1] * spacing, AED[0] * spacing, 'rs', markersize=10)
+
+# Plot candidate locations
+for location in candidate_location_indices:
+    plt.plot(location[1] * spacing, location[0] * spacing, 'g^', markersize=10)
+
+# Add labels and title
+plt.xlabel('X-coordinate')
+plt.ylabel('Y-coordinate')
+plt.title('Candidate AEDs and Locations on Grid')
+
+# Set aspect ratio and grid
+plt.gca().set_aspect('equal', adjustable='box')
+plt.grid(True)
+
+# Show plot
+plt.legend(['Grid Points', 'Candidate AEDs', 'Candidate Locations'], loc='upper right')
+plt.show()
+'''
+
+
+'''
+# Define grid dimensions and spacing
+rows = 9
+columns = 10
+spacing = 25
+
+# Generate grid points
+grid_points = []
+for i in range(rows):
+    for j in range(columns):
+        x = j * spacing
+        y = i * spacing
+        grid_points.append((x, y))
+
+
+# Calculate Euclidean distance matrix
+num_points = len(grid_points)
+distance_matrix = np.zeros((num_points, num_points))
+
+for i in range(num_points):
+    for j in range(num_points):
+        x1, y1 = grid_points[i]
+        x2, y2 = grid_points[j]
+        distance = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+        distance_matrix[i, j] = distance
+        
+# Print distance matrix
+print("Euclidean Distance Matrix:")
+print(distance_matrix)
+
+# Create binary matrix indicating distances less than or equal to 100
+dij_a = np.where(distance_matrix <= 100, 1, 0)
+
+# Print binary matrix
+print("Binary Matrix (dij_a) indicating distances <= 100:")
+print(dij_a)
+
 '''
