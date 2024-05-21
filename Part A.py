@@ -44,7 +44,7 @@ print(dij_a)
 
 
 # Define candidate AEDs
-candidate_AEDs = [(3, 1)]
+candidate_AEDs = [(3, 1), (5, 2), (5, 3)]
 candidate_locations = [(9, 7), (5, 2), (5, 3)]
 
 # Create a coverage matrix a_ij
@@ -62,6 +62,55 @@ for i, AED in enumerate(candidate_AEDs):
 # Print the coverage matrix
 print("Coverage Matrix (a_ij):")
 print(a_ij)
+
+import matplotlib.pyplot as plt
+
+# Define grid dimensions and spacing
+rows = 9
+columns = 10
+spacing = 1
+
+# Define candidate AEDs and candidate locations
+candidate_AEDs = [(3, 1), (5, 2), (5, 3)]
+candidate_locations = [(2, 2), (5, 2), (5, 3)]
+
+# Create a grid of points
+grid_points = []
+for i in range(rows):
+    for j in range(columns):
+        x = j * spacing
+        y = i * spacing
+        grid_points.append((x, y))
+
+# Convert candidate AEDs and candidate locations to grid indices
+candidate_AED_indices = [(int(y / spacing), int(x / spacing)) for x, y in candidate_AEDs]
+candidate_location_indices = [(int(y / spacing), int(x / spacing)) for x, y in candidate_locations]
+
+# Plot the grid
+plt.figure(figsize=(8, 6))
+for point in grid_points:
+    plt.plot(point[0], point[1], 'bo', markersize=6)
+
+# Plot candidate AEDs
+for AED in candidate_AED_indices:
+    plt.plot(AED[1] * spacing, AED[0] * spacing, 'rs', markersize=10)
+'''
+# Plot candidate locations
+for location in candidate_location_indices:
+    plt.plot(location[1] * spacing, location[0] * spacing, 'g^', markersize=10)
+'''
+# Add labels and title
+plt.xlabel('X-coordinate')
+plt.ylabel('Y-coordinate')
+plt.title('Candidate AEDs and Locations on Grid')
+
+# Set aspect ratio and grid
+plt.gca().set_aspect('equal', adjustable='box')
+plt.grid(True)
+
+# Show plot
+plt.legend(['Grid Points', 'Candidate AEDs', 'Candidate Locations'], loc='upper right')
+plt.show()
 
 
 
