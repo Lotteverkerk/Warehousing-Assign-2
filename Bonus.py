@@ -103,8 +103,8 @@ if best_location:
     ax.add_patch(circle2)
 
 plt.legend()
-plt.xlim(0, 30)
-plt.ylim(0, 19)  # Set limits to original because we're transforming the data, not the axes
+plt.xlim(-1, 30)
+plt.ylim(-1, 19)  # Set limits to original because we're transforming the data, not the axes
 plt.xticks(range(0, 30))
 plt.yticks(range(0, 19))
 plt.show()
