@@ -42,6 +42,7 @@ for p in all_points:
         print(p)
 
 import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
 
 # Assuming `all_points` and `specific_points` are already defined from your optimization setup
 # Let's assume the results from your optimization model have provided the AED locations
@@ -58,6 +59,7 @@ uncovered_points = [q for q in specific_points if q not in covered_points]
 
 # Create plot
 plt.figure(figsize=(12, 8))
+ax = plt.gca()
 plt.grid(True)
 plt.title('AED Placement and Coverage')
 plt.xlabel('X Coordinate')
@@ -71,10 +73,10 @@ for point in all_points:
 for point in specific_points:
     plt.plot(point[0], point[1], 'o', color='blue', label='Cardiac arrests' if point == specific_points[0] else "")
 
-
-# Plot AED locations
 for aed in aed_locations:
     plt.plot(aed[0], aed[1], 'P', color='gold', markersize=12, label='AED Locations' if aed == aed_locations[0] else "")
+    coverage_circle = Circle((aed[0], aed[1]), radius=4, color='gold', fill=False, linewidth=3, linestyle='dotted')
+    ax.add_patch(coverage_circle)
 
 # Add legend
 handles, labels = plt.gca().get_legend_handles_labels()
