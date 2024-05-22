@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import time
 import pandas as pd
 import numpy as np
+import pulp
 
 # Set grid dimensions
 rows = 30
@@ -24,9 +25,6 @@ for i in range(len(points)):
         x2, y2 = points[j]
         distance_matrix[i, j] = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
-# Print a small part of the matrix as example
-print(distance_matrix[:5, :5])  # Displaying only a small part to check
-
 treshold = 4
 
 a_ij_matrix = (distance_matrix <= treshold).astype(int)
@@ -38,9 +36,6 @@ index_j = points.index((18, 18))
 # Check if a_ij is 1 (covered) or 0 (not covered)
 covered = a_ij_matrix[index_i, index_j]
 print(f"Point (7, 10) covers Point (5, 9): {'Yes' if covered == 1 else 'No'}")
-
-import pulp
-import numpy as np
 
 # List of all points in the grid (30x19)
 all_points = [(x, y) for x in range(30) for y in range(19)]
@@ -108,15 +103,15 @@ for point in all_points:
 
 # Plot specific points
 for point in specific_points:
-    plt.plot(point[0], point[1], 'o', color='blue', label='Specific Points' if point == specific_points[0] else "")
+    plt.plot(point[0], point[1], 'o', color='blue', label='Cardiac arrests' if point == specific_points[0] else "")
 
 # Plot covered points
 for point in covered_points:
-    plt.plot(point[0], point[1], '^', color='green', label='Covered Points' if point == covered_points[0] else "")
+    plt.plot(point[0], point[1], '^', color='green', label='Covered cardiac arrests' if point == covered_points[0] else "")
 
 # Plot uncovered points
 for point in uncovered_points:
-    plt.plot(point[0], point[1], 'x', color='red', label='Uncovered Points' if point == uncovered_points[0] else "")
+    plt.plot(point[0], point[1], 'x', color='red', label='Uncovered cardiac arrests' if point == uncovered_points[0] else "")
 
 # Plot AED locations
 for aed in aed_locations:
