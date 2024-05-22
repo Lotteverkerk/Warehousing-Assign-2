@@ -8,7 +8,7 @@ import numpy as np
 
 # Define candidate AEDs
 candidate_AEDs = [(2,2),(2,6),(3, 4),(3, 5),(3, 6),(3, 9), (4, 6), (5, 5), (5, 6), (5, 8), (6, 8), (7, 2), (7, 3),(7,6)]
-candidate_locations = [(9, 7), (5, 2), (5, 3)]
+candidate_locations = [(2,2),(2,6),(3, 4),(3, 5),(3, 6),(3, 9), (4, 6), (5, 5), (5, 6), (5, 8), (6, 8), (7, 2), (7, 3),(7,6)]
 
 # Create a coverage matrix a_ij
 a_ij = np.zeros((len(candidate_AEDs), len(candidate_locations)), dtype=int)
@@ -25,6 +25,14 @@ for i, AED in enumerate(candidate_AEDs):
 # Print the coverage matrix
 print("Coverage Matrix (a_ij):")
 print(a_ij)
+
+# Keep only rows 1 and 6 (index 0 and 5)
+filtered_a_ij = a_ij[[0, 5], :]
+
+# Print the filtered coverage matrix
+print("Filtered Coverage Matrix (a_ij) with rows 1 and 6:")
+print(filtered_a_ij)
+
 
 import matplotlib.pyplot as plt
 
@@ -151,10 +159,6 @@ rows = 9
 columns = 10
 spacing = 1
 
-# Define candidate AEDs and candidate locations
-candidate_AEDs = [(3, 1), (5, 2), (5, 3)]
-candidate_locations = [(2, 2), (5, 2), (5, 3)]
-
 # Create a grid of points
 grid_points = []
 for i in range(rows):
@@ -194,41 +198,58 @@ plt.show()
 '''
 
 
-'''
+
 # Define grid dimensions and spacing
 rows = 9
 columns = 10
 spacing = 25
 
-# Generate grid points
-grid_points = []
-for i in range(rows):
-    for j in range(columns):
-        x = j * spacing
-        y = i * spacing
-        grid_points.append((x, y))
+# Define candidate AEDs
+candidate_AEDs = [(3, 9), (5, 8), (6, 8),(2,6),(3, 6),(4, 6), (5, 6), (7,6), (3, 5), (5, 5), (3, 4), (7, 3), (2, 2), (7, 2)]
+candidate_locations = [(3, 9), (5, 8), (6, 8),(2,6),(3, 6),(4, 6), (5, 6), (7,6), (3, 5), (5, 5), (3, 4), (7, 3), (2, 2), (7, 2)]
 
+## Calculate Euclidean distance matrix between candidate_AEDs and candidate_locations
+num_AEDs = len(candidate_AEDs)
+num_locations = len(candidate_locations)
+distance_matrix = np.zeros((num_AEDs, num_locations))
 
-# Calculate Euclidean distance matrix
-num_points = len(grid_points)
-distance_matrix = np.zeros((num_points, num_points))
-
-for i in range(num_points):
-    for j in range(num_points):
-        x1, y1 = grid_points[i]
-        x2, y2 = grid_points[j]
-        distance = np.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+for i in range(num_AEDs):
+    for j in range(num_locations):
+        x1, y1 = candidate_AEDs[i]
+        x2, y2 = candidate_locations[j]
+        distance = np.sqrt((x2 - x1)**2 + (y2 - y1)**2) * spacing
         distance_matrix[i, j] = distance
-        
-# Print distance matrix
+
+# Round the distance matrix to 1 decimal place
+rounded_distance_matrix = np.round(distance_matrix, 0)
+
+# Print the rounded distance matrix
 print("Euclidean Distance Matrix:")
-print(distance_matrix)
+print(rounded_distance_matrix)
+
 
 # Create binary matrix indicating distances less than or equal to 100
-dij_a = np.where(distance_matrix <= 100, 1, 0)
+a_ij = np.where(distance_matrix <= 100, 1, 0)
+print("Coverage Matrix (a_ij):")
+print(a_ij)
 
-# Print binary matrix
-print("Binary Matrix (dij_a) indicating distances <= 100:")
-print(dij_a)
+# Count the number of 1s in each row
+count_ones_per_row = np.sum(a_ij, axis=0)
 
-'''
+# Print the count of 1s in each row
+print("Count of 1s in each row:")
+print(count_ones_per_row)
+
+# Keep only rows 1 and 6 (index 0 and 5)
+filtered_a_ij = a_ij[[12, 13], :]
+
+# Print the filtered coverage matrix
+print("Filtered Coverage Matrix (a_ij) with rows 1 and 6:")
+print(filtered_a_ij)
+
+# Keep only rows 1 and 6 (index 0 and 5)
+filtered_a_ij = a_ij[[13], :]
+
+# Print the filtered coverage matrix
+print("Filtered Coverage Matrix (a_ij) with rows 1 and 6:")
+print(filtered_a_ij)
