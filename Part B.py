@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import time
 import pandas as pd
 import numpy as np
+import pulp
 
 # Set grid dimensions
 rows = 30
@@ -24,9 +25,6 @@ for i in range(len(points)):
         x2, y2 = points[j]
         distance_matrix[i, j] = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 
-# Print a small part of the matrix as example
-print(distance_matrix[:5, :5])  # Displaying only a small part to check
-
 treshold = 4
 
 a_ij_matrix = (distance_matrix <= treshold).astype(int)
@@ -38,9 +36,6 @@ index_j = points.index((18, 18))
 # Check if a_ij is 1 (covered) or 0 (not covered)
 covered = a_ij_matrix[index_i, index_j]
 print(f"Point (7, 10) covers Point (5, 9): {'Yes' if covered == 1 else 'No'}")
-
-import pulp
-import numpy as np
 
 # List of all points in the grid (30x19)
 all_points = [(x, y) for x in range(30) for y in range(19)]
@@ -88,6 +83,7 @@ for p in all_points:
         print(p)
 
 import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
 
 # Assuming `all_points` and `specific_points` are already defined from your optimization setup
 # Let's assume the results from your optimization model have provided the AED locations and which points are covered
@@ -97,8 +93,9 @@ uncovered_points = [q for q in specific_points if q not in covered_points]
 
 # Create plot
 plt.figure(figsize=(12, 8))
+ax = plt.gca()
 plt.grid(True)
-plt.title('AED Placement and Coverage on a 30x19 Grid')
+plt.title('AED Placement and Coverage')
 plt.xlabel('X Coordinate')
 plt.ylabel('Y Coordinate')
 
@@ -108,19 +105,20 @@ for point in all_points:
 
 # Plot specific points
 for point in specific_points:
-    plt.plot(point[0], point[1], 'o', color='blue', label='Specific Points' if point == specific_points[0] else "")
+    plt.plot(point[0], point[1], 'o', color='blue', label='Cardiac arrests' if point == specific_points[0] else "")
 
 # Plot covered points
 for point in covered_points:
-    plt.plot(point[0], point[1], '^', color='green', label='Covered Points' if point == covered_points[0] else "")
+    plt.plot(point[0], point[1], '^', color='green', label='Covered cardiac arrests' if point == covered_points[0] else "")
 
 # Plot uncovered points
 for point in uncovered_points:
-    plt.plot(point[0], point[1], 'x', color='red', label='Uncovered Points' if point == uncovered_points[0] else "")
+    plt.plot(point[0], point[1], 'x', color='red', label='Uncovered cardiac arrests' if point == uncovered_points[0] else "")
 
-# Plot AED locations
 for aed in aed_locations:
     plt.plot(aed[0], aed[1], 'P', color='gold', markersize=12, label='AED Locations' if aed == aed_locations[0] else "")
+    coverage_circle = Circle((aed[0], aed[1]), radius=4, color='gold', fill=False, linewidth=3, linestyle='dotted')
+    ax.add_patch(coverage_circle)
 
 # Add legend
 handles, labels = plt.gca().get_legend_handles_labels()
