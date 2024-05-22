@@ -57,25 +57,32 @@ for q in specific_points:
 # Determine uncovered points
 uncovered_points = [q for q in specific_points if q not in covered_points]
 
+cols = 19  # Assuming a grid with 19 columns for the y-axis
+
 # Create plot
 plt.figure(figsize=(12, 8))
 ax = plt.gca()
 plt.grid(True)
-plt.title('AED Placement and Coverage')
+plt.title('Optimal AED Placement for full coverage')
 plt.xlabel('X Coordinate')
 plt.ylabel('Y Coordinate')
 
+# Function to mirror y-coordinate
+mirror_y = lambda y: (cols - 1) - y
+
 # Plotting all points on the grid as a base layer (optional)
 for point in all_points:
-    plt.plot(point[0], point[1], 'o', color='lightgray', alpha=0.5)
+    plt.plot(point[0], mirror_y(point[1]), 'o', color='lightgray', alpha=0.5)
 
 # Plot specific points
 for point in specific_points:
-    plt.plot(point[0], point[1], 'o', color='blue', label='Cardiac arrests' if point == specific_points[0] else "")
+    plt.plot(point[0], mirror_y(point[1]), 'o', color='blue', label='Cardiac arrests' if point == specific_points[0] else "")
 
+# Plot AED locations and their coverage circles
 for aed in aed_locations:
-    plt.plot(aed[0], aed[1], 'P', color='gold', markersize=12, label='AED Locations' if aed == aed_locations[0] else "")
-    coverage_circle = Circle((aed[0], aed[1]), radius=4, color='gold', fill=False, linewidth=3, linestyle='dotted')
+    mirrored_aed_y = mirror_y(aed[1])
+    plt.plot(aed[0], mirrored_aed_y, 'P', color='gold', markersize=12, label='AED Locations' if aed == aed_locations[0] else "")
+    coverage_circle = Circle((aed[0], mirrored_aed_y), radius=4, color='orange', fill=False, linewidth=3, linestyle='dotted', label='within 100m radius')
     ax.add_patch(coverage_circle)
 
 # Add legend

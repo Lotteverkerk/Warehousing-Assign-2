@@ -64,8 +64,8 @@ coverage = pulp.LpVariable.dicts("coverage", specific_points, cat=pulp.LpBinary)
 
 model += pulp.lpSum(coverage[q] for q in specific_points)
 
-# Constraint: Only 2 AEDs can be placed
-model += pulp.lpSum(x[p] for p in all_points) == 2
+# Constraint: at most 2 AEDs can be placed
+model += pulp.lpSum(x[p] for p in all_points) <=2
 
 # Coverage constraints
 for q in specific_points:
@@ -91,42 +91,54 @@ aed_locations = [(p[0], p[1]) for p in all_points if pulp.value(x[p]) == 1]
 covered_points = [q for q in specific_points if pulp.value(coverage[q]) == 1]
 uncovered_points = [q for q in specific_points if q not in covered_points]
 
+import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
+
+# Assuming `all_points`, `specific_points`, `covered_points`, `uncovered_points`, and `aed_locations` are defined
+cols = 19  # Assuming a grid with 19 columns for the y-axis
+
+# Function to mirror y-coordinates
+mirror_y = lambda y: (cols - 1) - y
+
 # Create plot
 plt.figure(figsize=(12, 8))
 ax = plt.gca()
 plt.grid(True)
-plt.title('AED Placement and Coverage')
+plt.title('Optimal placement of 2 AEDs')
 plt.xlabel('X Coordinate')
 plt.ylabel('Y Coordinate')
 
 # Plotting all points on the grid as a base layer (optional)
 for point in all_points:
-    plt.plot(point[0], point[1], 'o', color='lightgray', alpha=0.5)
+    plt.plot(point[0], mirror_y(point[1]), 'o', color='lightgray', alpha=0.5)
 
 # Plot specific points
 for point in specific_points:
-    plt.plot(point[0], point[1], 'o', color='blue', label='Cardiac arrests' if point == specific_points[0] else "")
+    plt.plot(point[0], mirror_y(point[1]), 'o', color='blue', label='Cardiac arrests' if point == specific_points[0] else "")
 
 # Plot covered points
 for point in covered_points:
-    plt.plot(point[0], point[1], '^', color='green', label='Covered cardiac arrests' if point == covered_points[0] else "")
+    plt.plot(point[0], mirror_y(point[1]), '^', color='green', label='Covered cardiac arrests' if point == covered_points[0] else "")
 
 # Plot uncovered points
 for point in uncovered_points:
-    plt.plot(point[0], point[1], 'x', color='red', label='Uncovered cardiac arrests' if point == uncovered_points[0] else "")
+    plt.plot(point[0], mirror_y(point[1]), 'x', color='red', label='Uncovered cardiac arrests' if point == uncovered_points[0] else "")
 
+# Plot AED locations and their coverage circles
 for aed in aed_locations:
-    plt.plot(aed[0], aed[1], 'P', color='gold', markersize=12, label='AED Locations' if aed == aed_locations[0] else "")
-    coverage_circle = Circle((aed[0], aed[1]), radius=4, color='gold', fill=False, linewidth=3, linestyle='dotted')
+    mirrored_aed_y = mirror_y(aed[1])
+    plt.plot(aed[0], mirrored_aed_y, 'P', color='gold', markersize=12, label='AED Locations' if aed == aed_locations[0] else "")
+    coverage_circle = Circle((aed[0], mirrored_aed_y), radius=4, color='orange', fill=False, linewidth=3, linestyle='dotted', label='within 100m radius')
     ax.add_patch(coverage_circle)
 
-# Add legend
+# Add legend, ensuring it shows without duplicate labels
 handles, labels = plt.gca().get_legend_handles_labels()
-by_label = dict(zip(labels, handles))  # removing duplicate labels
+by_label = dict(zip(labels, handles))
 plt.legend(by_label.values(), by_label.keys())
 
 plt.xlim(-1, 30)  # Adjust as necessary
 plt.ylim(-1, 19)  # Adjust as necessary
 plt.xticks(range(0, 30))
-plt.yticks(range(0, 19))
+plt.yticks(range(0, 19))  # Make sure y-ticks reflect the mirrored y-axis
 plt.show()
+
