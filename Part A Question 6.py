@@ -2,9 +2,11 @@ import gurobipy as gp
 import math
 from gurobipy import GRB
 import matplotlib.pyplot as plt
+from matplotlib.patches import Circle
 import time
 import pandas as pd
 import numpy as np
+
 
 # Define grid dimensions and spacing
 rows = 9
@@ -40,82 +42,14 @@ a_ij = np.where(distance_matrix <= 100, 1, 0)
 print("Coverage Matrix (a_ij):")
 print(a_ij)
 
-# Count the number of 1s in each row
-count_ones_per_row = np.sum(a_ij, axis=0)
-
-# Print the count of 1s in each row
-print("Count of 1s in each row:")
-print(count_ones_per_row)
-
-# Keep only rows 1 and 6 (index 0 and 5)
-filtered_a_ij = a_ij[[12, 13], :]
-
-# Print the filtered coverage matrix
-print("Filtered Coverage Matrix (a_ij) with rows 1 and 6:")
-print(filtered_a_ij)
-
-# Keep only rows 1 and 6 (index 0 and 5)
-filtered_a_ij = a_ij[[13], :]
-
-# Print the filtered coverage matrix
-print("Filtered Coverage Matrix (a_ij) with rows 1 and 6:")
-print(filtered_a_ij)
-
-
-# Create the model
-model = gp.Model("AED_Placement")
-
-# Decision variables
-y = model.addVars(num_AEDs, vtype=GRB.BINARY, name="y")
-
-# Objective: Minimize the number of AEDs placed
-model.setObjective(gp.quicksum(y[i] for i in range(num_AEDs)), GRB.MINIMIZE)
-
-# Coverage constraints: Ensure every cardiac arrest point is covered by at least one AED
-for j in range(num_locations):
-    model.addConstr(gp.quicksum(a_ij[i, j] * y[i] for i in range(num_AEDs)) >= 1, name=f"cover_{j}")
-
-# Optimize the model
-model.optimize()
-
-# Output results
-if model.status == GRB.OPTIMAL:
-    print("Number of AEDs located:", model.objVal)
-    print("Locations to place AEDs:")
-    aed_locations = [candidate_AEDs[i] for i in range(num_AEDs) if y[i].X > 0.5]
-    print(aed_locations)
-
-    # Visualization
-    plt.figure(figsize=(12, 8))
-    plt.title('AED Placement and Coverage on a 30x19 Grid')
-    plt.xlabel('X Coordinate')
-    plt.ylabel('Y Coordinate')
-
-    # Plot AED locations
-    for aed in aed_locations:
-        plt.plot(aed[0], aed[1], 'P', color='gold', markersize=15, label='AED Locations' if aed == aed_locations[0] else "")
-
-    # Plot specific points
-    for idx, point in enumerate(candidate_locations):
-        if y[idx].X > 0.5:
-            plt.plot(point[0], point[1], 'o', color='green', label='Covered Points' if idx == 0 else "")
-        else:
-            plt.plot(point[0], point[1], 'x', color='red', label='Uncovered Points' if idx == 0 else "")
-
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-else:
-    print("No optimal solution found.")
-
-import matplotlib.pyplot as plt
-from matplotlib.patches import Circle
+# Manually solution solution
+y_values = [0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]
 
 # Retrieve the locations where AEDs are placed
-aed_locations = [candidate_AEDs[i] for i in range(len(candidate_AEDs)) if y[i].X > 0.5]
+aed_locations = [candidate_AEDs[i] for i in range(num_AEDs) if y_values[i] > 0.5]
 
 # Determine which points are covered by the AEDs placed
-covered_points = [candidate_locations[j] for j in range(len(candidate_locations)) if any(a_ij[i, j] * y[i].X > 0.5 for i in range(len(candidate_AEDs)))]
+covered_points = [candidate_locations[j] for j in range(num_locations) if any(a_ij[i, j] * y_values[i] > 0.5 for i in range(num_AEDs))]
 
 # Determine which points are not covered
 uncovered_points = [q for q in candidate_locations if q not in covered_points]
@@ -155,10 +89,10 @@ handles, labels = plt.gca().get_legend_handles_labels()
 by_label = dict(zip(labels, handles))  # removing duplicate labels
 plt.legend(by_label.values(), by_label.keys())
 
-plt.xlim(-1, 10)  # Adjust as necessary
-plt.ylim(-1, 10)  # Adjust as necessary
-plt.xticks(range(0, 10))
-plt.yticks(range(0, 10))
+plt.xlim(-1, 12)  # Adjust as necessary
+plt.ylim(-1, 12)  # Adjust as necessary
+plt.xticks(range(0, 12))
+plt.yticks(range(0, 12))
 plt.show()
 
 
