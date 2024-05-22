@@ -1,7 +1,7 @@
 import gurobipy as gp
 from gurobipy import GRB
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Define the grid dimensions
 rows, cols = 30, 19
@@ -14,39 +14,39 @@ specific_points = [(11, 0), (8, 2), (10, 2), (23, 2), (25, 2), (30, 3), (10, 4),
                    (14, 11), (16, 11), (21, 11), (1, 12), (11, 12), (12, 12), (28, 12), (29, 13), (30, 13), (9, 14), (11, 14),
                    (12, 14), (13, 14), (18, 15), (5, 16), (14, 16), (15, 17), (19, 17), (26, 17), (14, 18), (15, 18), (17, 18), (19, 19)]
 
-# Compute Euclidean distance between all pairs
+# Compute Euclidean distance between all pairs of points
 def euclidean_distance(p1, p2):
     return np.sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
 distance_threshold = 4
-model = gp.Model("AED_Placement")
+
+# Create a model
+model = gp.Model("AED_Placement_Minimal")
 
 # Decision variables
 x = model.addVars(all_points, vtype=GRB.BINARY, name="x")
-coverage = model.addVars(specific_points, vtype=GRB.BINARY, name="coverage")
 
-# Objective: Maximize the number of specific points covered
-model.setObjective(gp.quicksum(coverage[q] for q in specific_points), GRB.MAXIMIZE)
+# Objective: Minimize the number of AEDs
+model.setObjective(gp.quicksum(x[p] for p in all_points), GRB.MINIMIZE)
 
-# Constraint: Only 2 AEDs can be placed
-model.addConstr(x.sum() == 2, "AED_Limit")
-
-# Coverage constraints
+# Constraints to ensure each specific point is covered by at least one AED within the distance threshold
 for q in specific_points:
-    model.addConstr(coverage[q] <= gp.quicksum(x[p] for p in all_points if euclidean_distance(p, q) <= distance_threshold), name=f"cover_{q}")
+    model.addConstr(gp.quicksum(x[p] for p in all_points if euclidean_distance(p, q) <= distance_threshold) >= 1, name=f"cover_{q}")
 
+# Optimize the model
 model.optimize()
 
 # Output results
 if model.status == GRB.OPTIMAL:
-    print("Maximum number of points covered:", model.objVal)
+    print("Minimum number of AEDs needed:", model.objVal)
     print("Locations to place AEDs:")
     aed_locations = [p for p in all_points if x[p].X > 0.5]
     print(aed_locations)
 
     # Visualization
     plt.figure(figsize=(12, 8))
-    plt.title('AED Placement and Coverage on a 30x19 Grid')
+    plt.grid(True)
+    plt.title('Minimal AED Placement for Full Coverage')
     plt.xlabel('X Coordinate')
     plt.ylabel('Y Coordinate')
 
@@ -56,11 +56,16 @@ if model.status == GRB.OPTIMAL:
 
     # Plot specific points
     for point in specific_points:
-        if coverage[point].X > 0.5:
-            plt.plot(point[0], point[1], 'o', color='green', label='Covered Points' if point == specific_points[0] else "")
-        else:
-            plt.plot(point[0], point[1], 'x', color='red', label='Uncovered Points' if point == specific_points[0] else "")
+        plt.plot(point[0], point[1], 'o', color='blue', label='Specific Points' if point == specific_points[0] else "")
 
-    plt.legend()
-    plt.grid(True)
+    # Add legend
+    handles, labels = plt.gca().get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))  # removing duplicate labels
+    plt.legend(by_label.values(), by_label.keys())
+
+    plt.xlim(-1, 30)
+    plt.ylim(-1, 19)
+    plt.xticks(range(0, 30))
+    plt.yticks(range(0, 19))
     plt.show()
+

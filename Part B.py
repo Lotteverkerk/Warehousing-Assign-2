@@ -98,7 +98,7 @@ uncovered_points = [q for q in specific_points if q not in covered_points]
 # Create plot
 plt.figure(figsize=(12, 8))
 plt.grid(True)
-plt.title('AED Placement and Coverage on a 30x19 Grid')
+plt.title('AED Placement and Coverage')
 plt.xlabel('X Coordinate')
 plt.ylabel('Y Coordinate')
 
